@@ -3,8 +3,8 @@ import { Box, Typography, useTheme, IconButton, Dialog, DialogTitle, DialogConte
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
-import { db } from "../../firebase";
-import { collection,getDocs, doc, deleteDoc, updateDoc, } from "firebase/firestore";
+import { auth , db } from "../../firebase";
+import { collection, getDocs, doc, deleteDoc, updateDoc, } from "firebase/firestore";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -15,6 +15,7 @@ const ManageTeam = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [openModal, setOpenModal] = useState(false);
+  const [currentUserRole, setCurrentUserRole] = useState("user"); // Valor por defecto
 
   const fetchUsers = async () => {
     try {
@@ -24,6 +25,13 @@ const ManageTeam = () => {
         ...doc.data(),
       }));
       setUsers(usersData);
+
+      // Obtener rol del usuario actual desde Firestore por UID (ejemplo simplificado)
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const current = usersData.find(u => u.uid === currentUser.uid);
+        setCurrentUserRole(current?.rol || "user");
+      }
     } catch (error) {
       console.error("Error al obtener usuarios:", error);
     }
@@ -34,6 +42,7 @@ const ManageTeam = () => {
   }, []);
 
   const handleDelete = async (id) => {
+    if (currentUserRole !== "admin") return;
     if (window.confirm("¿Estás seguro de eliminar este usuario?")) {
       await deleteDoc(doc(db, "users", id));
       fetchUsers();
@@ -41,11 +50,13 @@ const ManageTeam = () => {
   };
 
   const handleEdit = (user) => {
+    if (currentUserRole === "user") return;
     setSelectedUser(user);
     setOpenModal(true);
   };
 
   const handleSave = async () => {
+    if (currentUserRole === "user") return;
     try {
       const userRef = doc(db, "users", selectedUser.id);
       const { id, ...userData } = selectedUser;
@@ -58,6 +69,7 @@ const ManageTeam = () => {
   };
 
   const toggleActivo = async (user) => {
+    if (currentUserRole === "user") return;
     try {
       const userRef = doc(db, "users", user.id);
       await updateDoc(userRef, { activo: !user.activo });
@@ -82,6 +94,7 @@ const ManageTeam = () => {
         <Switch
           checked={row.activo ?? true}
           onChange={() => toggleActivo(row)}
+          disabled={currentUserRole === "user"}
         />
       ),
     },
@@ -91,10 +104,16 @@ const ManageTeam = () => {
       flex: 1,
       renderCell: ({ row }) => (
         <Box>
-          <IconButton onClick={() => handleEdit(row)}>
+          <IconButton
+            onClick={() => handleEdit(row)}
+            disabled={currentUserRole === "user"}
+          >
             <EditIcon color="primary" />
           </IconButton>
-          <IconButton onClick={() => handleDelete(row.id)}>
+          <IconButton
+            onClick={() => handleDelete(row.id)}
+            disabled={currentUserRole !== "admin"}
+          >
             <DeleteIcon color="error" />
           </IconButton>
         </Box>
@@ -104,7 +123,10 @@ const ManageTeam = () => {
 
   return (
     <Box m="20px">
-      <Header title="Equipo" subtitle="Gestión de todos los miembros registrados" />
+      <Header
+        title="Equipo"
+        subtitle="Gestión de todos los miembros registrados"
+      />
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -130,27 +152,46 @@ const ManageTeam = () => {
           <TextField
             label="Nombre"
             value={selectedUser?.nombre || ""}
-            onChange={(e) => setSelectedUser({ ...selectedUser, nombre: e.target.value })}
+            onChange={(e) =>
+              setSelectedUser({ ...selectedUser, nombre: e.target.value })
+            }
+            disabled={currentUserRole === "user"}
           />
           <TextField
             label="Apellido"
             value={selectedUser?.apellido || ""}
-            onChange={(e) => setSelectedUser({ ...selectedUser, apellido: e.target.value })}
+            onChange={(e) =>
+              setSelectedUser({ ...selectedUser, apellido: e.target.value })
+            }
+            disabled={currentUserRole === "user"}
           />
           <TextField
             label="Departamento"
             value={selectedUser?.departamento || ""}
-            onChange={(e) => setSelectedUser({ ...selectedUser, departamento: e.target.value })}
+            onChange={(e) =>
+              setSelectedUser({ ...selectedUser, departamento: e.target.value })
+            }
+            disabled={currentUserRole === "user"}
           />
           <TextField
             label="Rol"
             value={selectedUser?.rol || ""}
-            onChange={(e) => setSelectedUser({ ...selectedUser, rol: e.target.value })}
+            onChange={(e) =>
+              setSelectedUser({ ...selectedUser, rol: e.target.value })
+            }
+            disabled={currentUserRole !== "admin"}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenModal(false)}>Cancelar</Button>
-          <Button onClick={handleSave} variant="contained" color="primary">Guardar</Button>
+          <Button
+            onClick={handleSave}
+            variant="contained"
+            color="primary"
+            disabled={currentUserRole === "user"}
+          >
+            Guardar
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
