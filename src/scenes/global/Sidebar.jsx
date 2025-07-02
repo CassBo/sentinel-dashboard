@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
-import 'react-pro-sidebar/dist/css/styles.css';
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
+import "react-pro-sidebar/dist/css/styles.css";
+import { Box, IconButton, Typography, useTheme, useMediaQuery } from "@mui/material";
 import { Link } from "react-router-dom";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -16,47 +16,98 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
-import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
-import { signOut } from "firebase/auth";
-import { auth } from "../../firebase";
-import { useNavigate } from "react-router-dom";
+import CloseIcon from "@mui/icons-material/Close";
+import React from "react"
 
-const Item = ({ title, to, icon, selected, setSelected }) => {
+const Item = ({ title, to, icon, selected, setSelected, isMobile, onClose }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const isActive = selected === title;
+
+  const handleClick = () => {
+    setSelected(title);
+    // Cerrar menú móvil al seleccionar un item
+    if (isMobile && onClose) {
+      onClose();
+    }
+  };
+
   return (
     <MenuItem
-      active={selected === title}
+      active={isActive}
+      onClick={handleClick}
+      icon={React.cloneElement(icon, {
+        style: {
+          color: isActive ? "#ffffff" : colors.grey[100],
+          fontSize: isMobile ? '20px' : '16px', // Iconos más grandes en móvil
+        },
+      })}
       style={{
-        color: colors.grey[100],
+        color: isActive ? "#ffffff" : colors.grey[100],
+        padding: isMobile ? "12px 16px" : "10px 16px", // Más padding en móvil
+        margin: "6px 0",
+        borderRadius: "15px",
+        backgroundColor: isActive ? colors.primary[600] : "transparent",
+        transition: "background-color 0.3s ease",
+        width: "95%",
+        marginLeft: "2%",
+        boxSizing: "border-box",
+        minHeight: isMobile ? '48px' : 'auto', // Altura mínima para toque fácil
       }}
-      onClick={() => setSelected(title)}
-      icon={icon}
     >
-      <Typography>{title}</Typography>
+      <Typography
+        sx={{
+          color: isActive ? "#ffffff" : colors.grey[100],
+          whiteSpace: "normal",
+          wordWrap: "break-word",
+          fontSize: isMobile ? '14px' : '13px', // Texto más grande en móvil
+          fontWeight: isMobile ? 500 : 400,
+        }}
+      >
+        {title}
+      </Typography>
       <Link to={to} />
     </MenuItem>
   );
 };
 
-const Sidebar = () => {
-  const navigate = useNavigate();
+const Sidebar = ({ isSidebar, isMobile, onClose }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(!isSidebar);
   const [selected, setSelected] = useState("Dashboard");
+  
+  // Auto-detectar si es tablet
+  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg'));
+
+  // En móvil, siempre mostrar expandido
+  // En tablet/desktop, usar el estado de colapso
+  const shouldCollapse = isMobile ? false : isCollapsed;
+
+  const handleToggleCollapse = () => {
+    if (!isMobile) {
+      setIsCollapsed(!isCollapsed);
+    }
+  };
 
   return (
     <Box
       sx={{
+        position: "relative",
+        height: "100vh",
+        width: shouldCollapse ? "80px" : isMobile ? "280px" : "250px", // Más ancho en móvil
+        transition: "width 0.3s ease",
+        // Sombra en móvil para efecto overlay
+        boxShadow: isMobile ? '2px 0 8px rgba(0,0,0,0.15)' : 'none',
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important`,
+          height: "100vh",
         },
         "& .pro-icon-wrapper": {
           backgroundColor: "transparent !important",
         },
         "& .pro-inner-item": {
-          padding: "5px 35px 5px 20px !important",
+          padding: isMobile ? "8px 20px 8px 16px !important" : "5px 35px 5px 20px !important",
         },
         "& .pro-inner-item:hover": {
           color: "#868dfb !important",
@@ -66,110 +117,141 @@ const Sidebar = () => {
         },
       }}
     >
-      <ProSidebar collapsed={isCollapsed}>
+      <ProSidebar collapsed={shouldCollapse}>
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
           <MenuItem
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
+            onClick={handleToggleCollapse}
+            icon={shouldCollapse ? <MenuOutlinedIcon /> : undefined}
             style={{
               margin: "10px 0 20px 0",
               color: colors.grey[100],
+              minHeight: isMobile ? '56px' : '48px', // Área de toque más grande en móvil
             }}
           >
-            {!isCollapsed && (
+            {!shouldCollapse && (
               <Box
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
                 ml="15px"
               >
-                <Typography variant="h3" color={colors.grey[100]}>
-                  ADMINIS
+                <Typography 
+                  variant={isMobile ? "h4" : "h3"} 
+                  color={colors.grey[100]}
+                  sx={{ fontSize: isMobile ? '1.5rem' : '1.875rem' }}
+                >
+                  ADMIN
                 </Typography>
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
-                  <MenuOutlinedIcon />
+                
+                {/* Botón de cerrar para móvil, toggle para desktop */}
+                <IconButton 
+                  onClick={isMobile ? onClose : handleToggleCollapse}
+                  sx={{ 
+                    color: colors.grey[100],
+                    padding: isMobile ? '12px' : '8px' // Área de toque más grande
+                  }}
+                >
+                  {isMobile ? <CloseIcon /> : <MenuOutlinedIcon />}
                 </IconButton>
               </Box>
             )}
           </MenuItem>
 
-          {!isCollapsed && (
+          {!shouldCollapse && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
                 <img
                   alt="profile-user"
-                  width="100px"
-                  height="100px"
+                  width={isMobile ? "80px" : "100px"} // Imagen más pequeña en móvil
+                  height={isMobile ? "80px" : "100px"}
                   src={`../../assets/user.png`}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
               </Box>
               <Box textAlign="center">
                 <Typography
-                  variant="h2"
+                  variant={isMobile ? "h3" : "h2"}
                   color={colors.grey[100]}
                   fontWeight="bold"
-                  sx={{ m: "10px 0 0 0" }}
+                  sx={{ 
+                    m: "10px 0 0 0",
+                    fontSize: isMobile ? '1.25rem' : '1.5rem'
+                  }}
                 >
                   Lesbiatan
                 </Typography>
-                <Typography variant="h5" color={colors.greenAccent[500]}>
+                <Typography 
+                  variant="h5" 
+                  color={colors.greenAccent[500]}
+                  sx={{ fontSize: isMobile ? '0.875rem' : '1rem' }}
+                >
                   VP Fancy Admin
                 </Typography>
               </Box>
             </Box>
           )}
 
-          <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+          <Box 
+            paddingLeft={shouldCollapse ? undefined : "0%"}
+            sx={{
+              // Scroll en móvil si hay muchos items
+              ...(isMobile && {
+                overflowY: 'auto',
+                maxHeight: 'calc(100vh - 200px)',
+                '&::-webkit-scrollbar': {
+                  width: '4px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  background: 'transparent',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: colors.grey[600],
+                  borderRadius: '2px',
+                },
+              })
+            }}
+          >
             <Item
               title="Dashboard"
-              to="/"
+              to="/dashboard"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              isMobile={isMobile}
+              onClose={onClose}
             />
 
-            <MenuItem
-              onClick={() => {
-                signOut(auth)
-                  .then(() => {
-                    navigate("/");
-                  })
-                  .catch((error) => {
-                    console.error("Error al cerrar sesión:", error);
-                  });
-              }}
-              icon={<LogoutOutlinedIcon />}
-              style={{
-                color: "rgb(255,0,0)",
-                marginBottom: "10px",
-              }}
-            > 
-              <Typography>Cerrar sesión</Typography>
-            </MenuItem>
-
-
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Data
-            </Typography>
+            {!shouldCollapse && (
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ 
+                  m: "15px 0 5px 20px",
+                  fontSize: isMobile ? '0.875rem' : '1rem'
+                }}
+              >
+                Data
+              </Typography>
+            )}
+            
             <Item
               title="Manage Team"
               to="/team"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              isMobile={isMobile}
+              onClose={onClose}
             />
             <Item
-              title="Add New User"
+              title="Contacts Information"
               to="/contacts"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              isMobile={isMobile}
+              onClose={onClose}
             />
             <Item
               title="Invoices Balances"
@@ -177,21 +259,31 @@ const Sidebar = () => {
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              isMobile={isMobile}
+              onClose={onClose}
             />
 
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Pages
-            </Typography>
+            {!shouldCollapse && (
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ 
+                  m: "15px 0 5px 20px",
+                  fontSize: isMobile ? '0.875rem' : '1rem'
+                }}
+              >
+                Pages
+              </Typography>
+            )}
+            
             <Item
               title="Profile Form"
               to="/form"
               icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              isMobile={isMobile}
+              onClose={onClose}
             />
             <Item
               title="Calendar"
@@ -199,6 +291,8 @@ const Sidebar = () => {
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              isMobile={isMobile}
+              onClose={onClose}
             />
             <Item
               title="FAQ Page"
@@ -206,21 +300,31 @@ const Sidebar = () => {
               icon={<HelpOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              isMobile={isMobile}
+              onClose={onClose}
             />
 
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Charts
-            </Typography>
+            {!shouldCollapse && (
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ 
+                  m: "15px 0 5px 20px",
+                  fontSize: isMobile ? '0.875rem' : '1rem'
+                }}
+              >
+                Charts
+              </Typography>
+            )}
+            
             <Item
               title="Bar Chart"
               to="/bar"
               icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              isMobile={isMobile}
+              onClose={onClose}
             />
             <Item
               title="Pie Chart"
@@ -228,6 +332,8 @@ const Sidebar = () => {
               icon={<PieChartOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              isMobile={isMobile}
+              onClose={onClose}
             />
             <Item
               title="Line Chart"
@@ -235,6 +341,8 @@ const Sidebar = () => {
               icon={<TimelineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              isMobile={isMobile}
+              onClose={onClose}
             />
             <Item
               title="Geography Chart"
@@ -242,6 +350,8 @@ const Sidebar = () => {
               icon={<MapOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              isMobile={isMobile}
+              onClose={onClose}
             />
           </Box>
         </Menu>

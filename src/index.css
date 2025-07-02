@@ -1,35 +1,87 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
 
-html,
-body,
-#root,
-.app,
-.content{
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root, .app, .content {
   height: 100%;
   width: 100%;
   font-family: 'Source Sans Pro', sans-serif;
 }
 
-.app{
-  display:flex;
-  position: relative;
+html, body, #root {
+  font-family: 'Roboto', sans-serif;
+  height: 100%;
 }
 
-::-webkit-scrollbar{
+.app {
+  display: flex;
+  position: relative;
+  height: 100vh;
+  width: 100%;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
   width: 10px;
 }
 
-/* Track */
-::-webkit-scrollbar-track{
+::-webkit-scrollbar-track {
   background-color: #e0e0e0;
 }
 
-/*Handle*/
-::-webkit-scrollbar-thumb{
+::-webkit-scrollbar-thumb {
   background: #888;
 }
 
-/*Handle on Hover*/
-::-webkit-scrollbar-thumb:hover{
+::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+/* Sidebar fixed on the left */
+.pro-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 250px; /* expanded width */
+  z-index: 1000;
+  transition: width 0.3s ease;
+  overflow-y: auto;
+}
+
+/* Main content with left margin */
+.content {
+  margin-left: 250px;
+  width: calc(100% - 250px);
+  padding: 20px;
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+/* Collapsed sidebar adjustments */
+.sidebar-collapsed .pro-sidebar {
+  width: 80px;
+}
+
+.sidebar-collapsed .content {
+  margin-left: 80px;
+  width: calc(100% - 80px);
+}
+
+/* Responsive for small screens */
+@media (max-width: 768px) {
+  .pro-sidebar {
+    position: relative;
+    width: 200px;
+    height: auto;
+  }
+
+  .content,
+  .sidebar-collapsed .content {
+    margin-left: 0;
+    width: 100%;
+  }
 }

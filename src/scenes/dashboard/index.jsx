@@ -21,7 +21,10 @@ const Dashboard = () => {
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
+        <Header
+          title="DASHBOARD"
+          subtitle="Welcome to your dashboard"
+        />
 
         <Box>
           <Button
@@ -31,6 +34,7 @@ const Dashboard = () => {
               fontSize: "14px",
               fontWeight: "bold",
               padding: "10px 20px",
+              borderRadius: "8px",
             }}
           >
             <DownloadOutlinedIcon sx={{ mr: "10px" }} />
@@ -46,19 +50,28 @@ const Dashboard = () => {
         gridAutoRows="140px"
         gap="20px"
       >
-        {/* ROW 1 */}
+        {/* ROW 1 - Statistics Cards */}
         <Box
           gridColumn="span 3"
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="center"
           justifyContent="center"
+          borderRadius="20px"
+          sx={{
+            transition: "transform 0.2s ease-in-out",
+            "&:hover": {
+              transform: "translateY(-2px)",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+            },
+          }}
         >
           <StatBox
             title="12,361"
             subtitle="Emails Sent"
             progress="0.75"
             increase="+14%"
+            subtitleColor={colors.grey[100]}
             icon={
               <EmailIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
@@ -66,18 +79,28 @@ const Dashboard = () => {
             }
           />
         </Box>
+        
         <Box
           gridColumn="span 3"
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="center"
           justifyContent="center"
+          borderRadius="20px"
+          sx={{
+            transition: "transform 0.2s ease-in-out",
+            "&:hover": {
+              transform: "translateY(-2px)",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+            },
+          }}
         >
           <StatBox
             title="431,225"
             subtitle="Sales Obtained"
             progress="0.50"
             increase="+21%"
+            subtitleColor={colors.grey[100]}
             icon={
               <PointOfSaleIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
@@ -85,18 +108,28 @@ const Dashboard = () => {
             }
           />
         </Box>
+        
         <Box
           gridColumn="span 3"
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="center"
           justifyContent="center"
+          borderRadius="20px"
+          sx={{
+            transition: "transform 0.2s ease-in-out",
+            "&:hover": {
+              transform: "translateY(-2px)",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+            },
+          }}
         >
           <StatBox
             title="32,441"
             subtitle="New Clients"
             progress="0.30"
             increase="+5%"
+            subtitleColor="#1B184C"
             icon={
               <PersonAddIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
@@ -104,18 +137,28 @@ const Dashboard = () => {
             }
           />
         </Box>
+        
         <Box
           gridColumn="span 3"
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="center"
           justifyContent="center"
+          borderRadius="20px"
+          sx={{
+            transition: "transform 0.2s ease-in-out",
+            "&:hover": {
+              transform: "translateY(-2px)",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+            },
+          }}
         >
           <StatBox
             title="1,325,134"
             subtitle="Traffic Received"
             progress="0.80"
             increase="+43%"
+            subtitleColor={colors.grey[100]}
             icon={
               <TrafficIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
@@ -124,16 +167,24 @@ const Dashboard = () => {
           />
         </Box>
 
-        {/* ROW 2 */}
+        {/* ROW 2 - Revenue Chart & Transactions */}
         <Box
           gridColumn="span 8"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
+          borderRadius="20px"
+          sx={{
+            transition: "transform 0.2s ease-in-out",
+            "&:hover": {
+              transform: "translateY(-2px)",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+            },
+          }}
         >
           <Box
             mt="25px"
             p="0 30px"
-            display="flex "
+            display="flex"
             justifyContent="space-between"
             alignItems="center"
           >
@@ -154,9 +205,18 @@ const Dashboard = () => {
               </Typography>
             </Box>
             <Box>
-              <IconButton>
+              <IconButton
+                sx={{
+                  "&:hover": {
+                    backgroundColor: colors.primary[600],
+                  },
+                }}
+              >
                 <DownloadOutlinedIcon
-                  sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
+                  sx={{
+                    fontSize: "26px",
+                    color: colors.greenAccent[500],
+                  }}
                 />
               </IconButton>
             </Box>
@@ -165,18 +225,26 @@ const Dashboard = () => {
             <LineChart isDashboard={true} />
           </Box>
         </Box>
+        
         <Box
           gridColumn="span 4"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
           overflow="auto"
+          borderRadius="20px"
+          sx={{
+            transition: "transform 0.2s ease-in-out",
+            "&:hover": {
+              transform: "translateY(-2px)",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+            },
+          }}
         >
           <Box
             display="flex"
             justifyContent="space-between"
             alignItems="center"
             borderBottom={`4px solid ${colors.primary[500]}`}
-            colors={colors.grey[100]}
             p="15px"
           >
             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
@@ -191,6 +259,12 @@ const Dashboard = () => {
               alignItems="center"
               borderBottom={`4px solid ${colors.primary[500]}`}
               p="15px"
+              sx={{
+                "&:hover": {
+                  backgroundColor: colors.primary[500],
+                  cursor: "pointer",
+                },
+              }}
             >
               <Box>
                 <Typography
@@ -208,7 +282,11 @@ const Dashboard = () => {
               <Box
                 backgroundColor={colors.greenAccent[500]}
                 p="5px 10px"
-                borderRadius="4px"
+                borderRadius="8px"
+                sx={{
+                  fontWeight: "bold",
+                  color: colors.grey[900],
+                }}
               >
                 ${transaction.cost}
               </Box>
@@ -216,15 +294,23 @@ const Dashboard = () => {
           ))}
         </Box>
 
-        {/* ROW 3 */}
+        {/* ROW 3 - Analytics Section */}
         <Box
           gridColumn="span 4"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
           p="30px"
+          borderRadius="20px"
+          sx={{
+            transition: "transform 0.2s ease-in-out",
+            "&:hover": {
+              transform: "translateY(-2px)",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+            },
+          }}
         >
-          <Typography variant="h5" fontWeight="600">
-            Campaign
+          <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
+            Campaign Performance
           </Typography>
           <Box
             display="flex"
@@ -237,20 +323,33 @@ const Dashboard = () => {
               variant="h5"
               color={colors.greenAccent[500]}
               sx={{ mt: "15px" }}
+              fontWeight="600"
             >
               $48,352 revenue generated
             </Typography>
-            <Typography>Includes extra misc expenditures and costs</Typography>
+            <Typography color={colors.grey[200]} textAlign="center">
+              Includes extra misc expenditures and costs
+            </Typography>
           </Box>
         </Box>
+        
         <Box
           gridColumn="span 4"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
+          borderRadius="20px"
+          sx={{
+            transition: "transform 0.2s ease-in-out",
+            "&:hover": {
+              transform: "translateY(-2px)",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+            },
+          }}
         >
           <Typography
             variant="h5"
             fontWeight="600"
+            color={colors.grey[100]}
             sx={{ padding: "30px 30px 0 30px" }}
           >
             Sales Quantity
@@ -259,21 +358,116 @@ const Dashboard = () => {
             <BarChart isDashboard={true} />
           </Box>
         </Box>
+        
         <Box
           gridColumn="span 4"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
           padding="30px"
+          borderRadius="20px"
+          sx={{
+            transition: "transform 0.2s ease-in-out",
+            "&:hover": {
+              transform: "translateY(-2px)",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+            },
+          }}
         >
           <Typography
             variant="h5"
             fontWeight="600"
+            color={colors.grey[100]}
             sx={{ marginBottom: "15px" }}
           >
             Geography Based Traffic
           </Typography>
           <Box height="200px">
             <GeographyChart isDashboard={true} />
+          </Box>
+        </Box>
+
+        {/* ROW 4 - Priority Status Cards */}
+      <Box
+          gridColumn="span 4"
+          backgroundColor="#C2B359"
+          p="30px"
+          borderRadius="20px"
+          sx={{
+            transition: "all 0.3s ease-in-out",
+            "&:hover": {
+              transform: "translateY(-4px)",
+              boxShadow: "0 8px 16px rgba(218, 165, 32, 0.3)",
+              backgroundColor: "#DAA520",
+            },
+          }}
+        >
+          <Typography variant="h5" fontWeight="600" color="#FFFFFF">
+            Low Priority
+          </Typography>
+          <Typography color="#E8F5E8" mt="10px" fontSize="14px">
+            Current low-priority items require minimal attention. Monitor 
+            trends and schedule for future review.
+          </Typography>
+          <Box mt="15px">
+            <Typography variant="h6" color="#E2FDE3" fontWeight="bold">
+              23 Items
+            </Typography>
+          </Box>
+        </Box>
+        
+        <Box
+          gridColumn="span 4"
+          backgroundColor="#F57C00"
+          p="30px"
+          borderRadius="20px"
+          sx={{
+            transition: "all 0.3s ease-in-out",
+            "&:hover": {
+              transform: "translateY(-4px)",
+              boxShadow: "0 8px 16px rgba(245, 124, 0, 0.3)",
+              backgroundColor: "#FF9800",
+            },
+          }}
+        >
+          <Typography variant="h5" fontWeight="600" color="#FFFFFF">
+            Medium Priority
+          </Typography>
+          <Typography color="#FFF3E0" mt="10px" fontSize="14px">
+            Medium-priority tasks need attention within the next week. 
+            Plan accordingly and allocate resources.
+          </Typography>
+          <Box mt="15px">
+            <Typography variant="h6" color="#FFE0B2" fontWeight="bold">
+              12 Items
+            </Typography>
+          </Box>
+        </Box>
+        
+        <Box
+          gridColumn="span 4"
+          backgroundColor="#D32F2F"
+          p="30px"
+          borderRadius="20px"
+          sx={{
+            transition: "all 0.3s ease-in-out",
+            "&:hover": {
+              transform: "translateY(-4px)",
+              boxShadow: "0 8px 16px rgba(211, 47, 47, 0.3)",
+              backgroundColor: "#E53935",
+            },
+          }}
+        >
+          <Typography variant="h5" fontWeight="600" color="#FFFFFF">
+            High Priority
+          </Typography>
+          <Typography color="#FFEBEE" mt="10px" fontSize="14px">
+            Critical items requiring immediate attention. Review and 
+            resolve as soon as possible.
+          </Typography>
+          <Box mt="15px">
+            <Typography variant="h6" color="#FFCDD2" fontWeight="bold">
+              5 Items
+            </Typography>
           </Box>
         </Box>
       </Box>
